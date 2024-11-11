@@ -1,6 +1,8 @@
-package io;
+package classes.io;
 
 import java.util.Scanner;
+
+import classes.core.App;
 
 public class Simple {
 	public static void clear() { //Will execute different ways of cleaning terminal for better visibility
@@ -15,11 +17,20 @@ public class Simple {
     public static void banner() {
         clear();
         System.out.println("""
-
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█▀▄▀█░█░█▄░█░█░█▀▀░█░█░▄▀█░█░█▄░█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█░▀░█░█░█░▀█░█░█▄▄░█▀█░█▀█░█░█░▀█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█▀▄▀█░█░█▄░█░█░█▀▀░█░█░▄▀█░█░█▄░█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█░▀░█░█░█░▀█░█░█▄▄░█▀█░█▀█░█░█░▀█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
                 """);
+    }
+
+    
+    public static void menuBanner() {
+        clear();
+        System.out.println("""
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█▀▄▀█░█░█▄░█░█░█▀▀░█░█░▄▀█░█░█▄░█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░█░▀░█░█░█░▀█░█░█▄▄░█▀█░█▀█░█░█░▀█░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░""");
     }
 
     public static String strInput(int maxChar) { // Will take a maximum of chars and return user input
@@ -74,15 +85,14 @@ public class Simple {
         } catch (Exception exception) {
             System.out.println("[X]: " + exception.getMessage());
             return false;
-        }
-
-        
+        } 
     }
     
 
     public static void pause() { // Will ask user to press ENTER
         Scanner sc = new Scanner(System.in);
-        System.out.println("\n[-] Press ENTER to continue...");
+        System.out.println("\n" + App.getRandomFact());
+        System.out.println("[-] Press ENTER to continue...");
         sc.nextLine();
         clear();
     }

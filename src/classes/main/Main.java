@@ -1,17 +1,19 @@
-package main;
+package classes.main;
 
-import core.BlockChain;
-import io.Menu;
-import other.Log;
+import classes.core.BlockChain;
+import classes.io.Menu;
+import classes.other.Log;
 
 public class Main {
 	public static void main(String[] args) {
         Boolean loop = true;
         BlockChain blockChain = new BlockChain();
+        Menu m = new Menu();
         Log log = new Log();
         
+        // Main loop
         while(loop) {
-            loop = Menu.menu(blockChain, log);
+            loop = m.menu(blockChain, log);
         }
 	}
 
