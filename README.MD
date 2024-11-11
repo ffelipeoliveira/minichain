@@ -1,15 +1,6 @@
 <h1 align="center" style="font-weight: bold;">🔗 MINICHAIN 🔗</h1>
 <p align="center">
     <b>A simple mini-mini Java console BlockChain to get the basis on how it works!</b></br>
-	Featuring hash encryption, Asymmetrical key encryption and a BlockChain with full transaction validation!
-</p>
-
----
-### How to use
-1. Generate a Key Pair
-2. Mine blocks to gather tokens
-3. Generate other Key Pairs
-4. Make transactions between Key Pairs
 
 ---
 ### How to run 🏃‍♂️
