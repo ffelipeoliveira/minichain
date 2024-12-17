@@ -1,6 +1,7 @@
-package classes.core;
+package core;
 
 import java.security.PublicKey;
+
 
 public class Transaction {
 	private final Transaction previous;
@@ -9,14 +10,23 @@ public class Transaction {
 	private PublicKey senderPublicKey;
 	private PublicKey receiverPublicKey;
 	private float tokenAmount;
+	private boolean isFee;
+	private final long timestamp;
 
+	public Transaction(Transaction previous, PublicKey senderPublicKey, String signature, String data) {
+		this.previous = previous;
+		this.senderPublicKey = senderPublicKey;
+		this.signature = signature;
+		this.timestamp = System.currentTimeMillis();
+	}
 
-	public Transaction(Transaction previous, PublicKey senderPublicKey, PublicKey receiverPublicKey, float tokenAmount, String signature) {
+	public Transaction(Transaction previous, PublicKey senderPublicKey, PublicKey receiverPublicKey, float tokenAmount, String signature, boolean isFee) {
 		this.previous = previous;
 		this.senderPublicKey = senderPublicKey;
 		this.receiverPublicKey = receiverPublicKey;
 		this.tokenAmount = tokenAmount;
 		this.signature = signature;
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	public Transaction(PublicKey senderPublicKey, PublicKey receiverPublicKey, float tokenAmount, String signature) {
@@ -25,16 +35,19 @@ public class Transaction {
 		this.receiverPublicKey = receiverPublicKey;
 		this.tokenAmount = tokenAmount;
 		this.signature = signature;
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	public Transaction(Transaction previous, String data) {
 		this.previous = previous;
 		this.data = data;
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	public Transaction(String data) {
 		this.previous = null;
 		this.data = data;
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	public Transaction getPrevious() {
@@ -57,9 +70,17 @@ public class Transaction {
 		return signature;
 	}
 
+	public boolean isFee() {
+		return isFee;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
 	@Override
 	public String toString() {
-		if (data == null) return ("$[(" + tokenAmount + ") " + senderPublicKey.hashCode() + "]=>[" + receiverPublicKey.hashCode() + "]");
-		else return data;
+		if (data == null) return ("(" + (tokenAmount - tokenAmount/100) + ") " + senderPublicKey.hashCode() + "=>" + receiverPublicKey.hashCode() + timestamp);
+		else return data + timestamp;
 	}
 }

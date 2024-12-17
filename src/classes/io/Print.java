@@ -1,9 +1,9 @@
-package classes.io;
+package io;
 
-import classes.core.App;
-import classes.core.Block;
-import classes.core.BlockChain;
-import classes.core.Transaction;
+import core.App;
+import core.Block;
+import core.Blockchain;
+import core.Transaction;
 
 public class Print {
 	private static final int MAX_BLOCKS_PER_ROW = 4; // Optimal for small terminals
@@ -18,6 +18,15 @@ public class Print {
         System.out.print(" ║   ");
     }
 
+    private static void printSpace(long number, int maxIntLength) { //The default number of available space for an number to be printed is 10 since they need an extra label (id, hash, nonce which is not implemented yet, and the previous hash)
+        for (int i = 0; i < (maxIntLength - App.getNumeralQtt(number)); i++) {
+            System.out.print(" ");
+        }
+        if(number >= 0) System.out.print(" "); //Negative numbers take up a extra character -
+        System.out.print(" ║   ");
+    }
+
+
     private static void printSpace(String str, int maxStrLength) { //The default number of available space for an information to be printed is 23 characters, since they don't need an extra label
         for (int i = 0; i < (maxStrLength - str.length()); i++) {
             System.out.print(" ");
@@ -25,7 +34,7 @@ public class Print {
         System.out.print(" ║   ");
     }
 
-	public static void FullBlock(Block block) { // Basic print of a full block information
+	public static void PrintFullBlock(Block block) { // Basic print of a full block information
         System.out.println("Showing full block information\n╔════════════════════════════════════════════════════════════════════════╗ ");
         System.out.print(  "║ BLOCK NUMBER ID       : " + block.getId());
         printSpace(block.getId(), 45);
@@ -33,21 +42,23 @@ public class Print {
         System.out.print(  "║ THIS BLOCK'S HASH     :  " + block.getHash());
         printSpace(block.getHash(), 45);
         System.out.println();
+        //System.out.println("║ TIMESTAMP             :  " + block.getTimestamp());
+        //printSpace(block.getTimestamp(), 45);
+        //System.out.println();
         if(block.getPrevHash() != null) {
             System.out.print(  "║ PREVIOUS BLOCK'S HASH  : " + block.getPrevHash());
             printSpace(block.getPrevHash(), 45);
-            System.out.println();
         }
         System.out.println("║░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░║");
         for (Transaction data : block.getData()) {
-            System.out.print("║ " + data.toString());
+            System.out.print("║ " + data.toString().substring(0, Math.min(data.toString().length(), 70)));
             printSpace(data.toString(), 70);
             System.out.println();
         }
         System.out.println("╚════════════════════════════════════════════════════════════════════════╝ ");
     }
 
-	public static void BlockChain(BlockChain blockChain) { //Will print an Array of blocks horizontally line by line
+	public static void PrintBlockchain(Blockchain blockChain) { //Will print an Array of blocks horizontally line by line
         int blockQtt = blockChain.length();
         int rows = 1; //Default amount of rows
         if(blockQtt > MAX_BLOCKS_PER_ROW) {
@@ -90,6 +101,11 @@ public class Print {
             System.out.println();
 
             for(int j = 0; (j < MAX_BLOCKS_PER_ROW && row[j] != null); j++) {
+                System.out.print("║ TIMESTAMP : " + row[j].getTimestamp() + "  ║   ");
+            }
+            System.out.println();
+
+            for(int j = 0; (j < MAX_BLOCKS_PER_ROW && row[j] != null); j++) {
                 System.out.print("║░░░░░░░░░░░░░░░░░░░░░░░░░║");
                 if (row[j].getPrevious() != null) {
                     if(App.validateLink(row[j], row[j].getPrevious())) System.out.print("===");
@@ -114,8 +130,7 @@ public class Print {
                 }
                 System.out.println();
             }
-            
-    
+
             for(int j = 0; (j < MAX_BLOCKS_PER_ROW && row[j] != null); j++) {
                 System.out.print("╚═════════════════════════╝   ");
             }

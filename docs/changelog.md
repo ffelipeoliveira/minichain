@@ -12,8 +12,14 @@
 * Changelog added
 * Comitted to Github
 
-### Ver 0.2 alpha from 11/11/2024
+### Ver 0.2 a from 11/11/2024
 * Asymmetrical Key encription added
 * KeyPair generator added
 * Transactions added
 * Hashing updated to hexadecimal
+
+### Ver 0.2 b from 13/12/2024
+* Better support for Key management
+* Added fees
+* SHA-256 fully implemented.
+* Added reports for better documentation

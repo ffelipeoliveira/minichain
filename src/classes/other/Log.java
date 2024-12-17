@@ -1,4 +1,4 @@
-package classes.other;
+package other;
 
 public class Log {
 	private static final int MAX_LOG = 5;

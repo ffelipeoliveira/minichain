@@ -1,4 +1,4 @@
-package classes.core;
+package core;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -6,13 +6,12 @@ import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.util.Base64;
 
-import classes.io.Simple;
+import io.Simple;
 
 public class App {
 
-    // Miscellaneous methods ##############################################
-
-	public static int getRandomNumber(int min, int max) { // Will take two number, the min and max values, and return a random number
+	// Will take two number, the min and max values, and return a random number
+	public static int getRandomNumber(int min, int max) {
 		return (int) ((Math.random() * (max - min)) + min);
 	}
 
@@ -31,7 +30,29 @@ public class App {
 		return "[+] Fun fact: " + facts[getRandomNumber(0,facts.length)];
 	}
 
-    public static int getNumeralQtt(int number) { // Will take a number and return the quantity of numerals on it
+ 	// Will take a number and return the quantity of numerals on it
+    public static int getNumeralQtt(int number) {
+        if (!(number == 0)) {
+            return (int) Math.floor(Math.log10(Math.abs(number))) + 1;
+        }
+        return 1;
+    }
+
+	// Will compare the Blockchain's length with itself's lenght and validate it
+	public void unFork(Blockchain thisBlockchain, Blockchain blockchain) {
+		if (blockchain.length() > thisBlockchain.length()) {
+			try {
+				App.validateBlockchain(blockchain);
+				thisBlockchain = blockchain;
+			} catch (Exception e) {
+				System.out.println("Invalid Blockchain");
+				Simple.pause();
+			}
+		}
+	}
+
+	// Will take a number and return the quantity of numerals on it
+	public static int getNumeralQtt(long number) {
         if (!(number == 0)) {
             return (int) Math.floor(Math.log10(Math.abs(number))) + 1;
         }
@@ -44,45 +65,45 @@ public class App {
 		return Base64.getEncoder().encodeToString(md.digest());
 	}
 
-	// BlockChain Block methods #############################################
+	// Blockchain Block methods #############################################
 
 	// Will try to mine a block
-	public static double mineBlock(BlockChain blockChain, PublicKey publicKey) throws Exception{
+	public static double mineBlock(String menuPath, Blockchain blockchain, PublicKey publicKey) throws Exception{
 		double nonce = 0;
-		int id = blockChain.length();
-		Transaction[] data = mergeTransactions(blockChain, blockChain.getTransactionHead());
+		int id = blockchain.length();
+		Transaction[] data = mergeTransactions(menuPath, blockchain, blockchain.getTransactionHead(), publicKey);
 
-		Block block = new Block(blockChain.getHead(), id , nonce, data);
-		while (!validateHash(blockChain, block)) {
+		Block block = new Block(blockchain.getHead(), id , nonce, data);
+		while (!validateHash(blockchain, block)) {
 			nonce++;
-			block = new Block(blockChain.getHead(), id , nonce, data);
+			block = new Block(blockchain.getHead(), id , nonce, data);
 		}
 
-		blockChain.addBlock(block, publicKey);
+		blockchain.addBlock(menuPath, block, publicKey);
 		return nonce;
 	}
 
 	// Will try to mine an already existing block
-	public static double mineBlock(BlockChain blockChain, Block block) throws Exception{
+	public static double mineBlock(Blockchain blockchain, Block block) throws Exception{
 		double nonce = 0;
 		System.out.println("[-] Nonce: " + nonce);
 		Block newBlock = new Block(block.getPrevious(), block.getId() , nonce, block.getData());
-		while (!validateHash(blockChain, block)) {
+		while (!validateHash(blockchain, block)) {
 			System.out.println("[-] Nonce: " + nonce);
 			nonce++;
 			newBlock = new Block(block.getPrevious(), block.getId() , nonce, block.getData());
 		}
 
-		Block aux = blockChain.getHead();
+		Block aux = blockchain.getHead();
 		while (aux.getPrevious().getId() != block.getId()) aux = aux.getPrevious();
 		aux.setPrevious(newBlock);
 		return nonce;
 	}
 
 	// Will return a specified block
-	public static Block searchBlock(int id, BlockChain blockChain) throws Exception{ 
-		Block current = blockChain.getHead();
-		for (int i = 0; (i < blockChain.length() && current != null); i++) {
+	public static Block searchBlock(int id, Blockchain blockchain) throws Exception{ 
+		Block current = blockchain.getHead();
+		for (int i = 0; (i < blockchain.length() && current != null); i++) {
 			if (current.getId() == id) return current;
 			current = current.getPrevious();
 		}
@@ -90,9 +111,9 @@ public class App {
 	}
 
 	// Will check wether or not the hash obey the difficulty rule
-	public static boolean validateHash(BlockChain blockChain, Block block) {
+	public static boolean validateHash(Blockchain blockchain, Block block) {
 		char[] c = block.getHash().toCharArray();
-		for(int i = 0; i < blockChain.difficulty(); i++) {
+		for(int i = 0; i < blockchain.difficulty(); i++) {
 			if (c[i] != '0') return false;
 		} 
 		return true;
@@ -108,30 +129,30 @@ public class App {
 		return false;
 	}
 
-	public static void validateBlockChain(BlockChain blockChain) throws Exception{ // Throws exception if blockChain isn't valid
-		Block aux = blockChain.getHead();
+	public static void validateBlockchain(Blockchain blockchain) throws Exception{ // Throws exception if blockchain isn't valid
+		Block aux = blockchain.getHead();
 		while (aux.getPrevious() != null) { 
 			if (!validateLink(aux, aux.getPrevious())) {
-				throw new Exception("[X] Invalid BlockChain. Hash " + calculateBlockHash(aux.getPrevious()) + " from block " + aux.getPrevious().getId() + " doesn't correspond to the expected hash " + aux.getPrevHash() + ". Please Reset your BlockChain.");
+				throw new Exception("[X] Invalid Blockchain. Hash " + calculateBlockHash(aux.getPrevious()) + " from block " + aux.getPrevious().getId() + " doesn't correspond to the expected hash " + aux.getPrevHash() + ". Please Reset your Blockchain.");
 			}
 			aux = aux.getPrevious();
 		}
 	}
 
-	// BlockChain Transaction methods #############################################
+	// Blockchain Transaction methods #############################################
 
-	// Will search through all BlockChain looking for transactions from a specific public key
-	public static float searchForTokens(BlockChain blockChain, PublicKey senderPublicKey) {
-		Block aux = blockChain.getHead();
+	// Will search through all Blockchain looking for transactions from a specific public key
+	public static float searchForTokens(String menuPath, Blockchain blockchain, PublicKey senderPublicKey) {
+		Block aux = blockchain.getHead();
 		float tokens = 0;
 
 		try {
-			PublicKey blockchainKey = Encryption.readBlokChainKey();
+			PublicKey blockchainKey = Encryption.readBlockchainKey();
 			if (senderPublicKey == blockchainKey) return 21000000;
 		} catch (IOException e) {
-			System.out.println("[X] BlockChain's public key not found.");
+			System.out.println("[X] Blockchain's public key not found.");
 		} catch (Exception e) {
-			Simple.banner();
+			Simple.banner(menuPath + " Search for Tokens (error)");
 			System.out.println("[X]" + e.getMessage());
 		}
 		
@@ -153,17 +174,17 @@ public class App {
 
 	// Overloading for better user experience
 	// Instead of loading a public key for searching, you can simply type the hashcode
-	public static float searchForTokens(BlockChain blockChain, String hashOfSenderPK) {
-		Block aux = blockChain.getHead();
+	public static float searchForTokens(String menuPath, Blockchain blockchain, String hashOfSenderPK) {
+		Block aux = blockchain.getHead();
 		float tokens = 0;
 
 		try {
-			PublicKey blockchainKey = Encryption.readBlokChainKey();
-			if (hashOfSenderPK == "" + blockchainKey.hashCode()) return 21000000;
+			PublicKey blockchainKey = Encryption.readBlockchainKey();
+			if (hashOfSenderPK.equals(Encryption.calculateKeyHash(blockchainKey))) return 21000000;
 		} catch (IOException e) {
-			System.out.println("[X] BlockChain's public key not found.");
+			System.out.println("[X] Blockchain's public key not found.");
 		} catch (Exception e) {
-			Simple.banner();
+			Simple.banner(menuPath + " > Search for tokens");
 			System.out.println("[X]" + e.getMessage());
 		}
 		
@@ -171,8 +192,8 @@ public class App {
 			for (Transaction data : aux.getData()) {
 				try {
 					isTransaction(data);
-					if (("" + data.getSenderPublicKey().hashCode()).equals(hashOfSenderPK)) tokens = tokens - data.getTokenAmount(); 
-					if (("" + data.getReceiverPublicKey().hashCode()).equals(hashOfSenderPK)) tokens = tokens + data.getTokenAmount(); 
+					if (Encryption.calculateKeyHash(data.getSenderPublicKey()).equals(hashOfSenderPK)) tokens = tokens - data.getTokenAmount(); 
+					if (Encryption.calculateKeyHash(data.getReceiverPublicKey()).equals(hashOfSenderPK)) tokens = tokens + data.getTokenAmount(); 
 				} catch (Exception e) {
 				}
 			}
@@ -193,20 +214,21 @@ public class App {
 	}
 
 	// Will check if the transaction can be done
-	public static boolean validateTransaction(BlockChain blockChain, Transaction transaction) throws Exception { 
+	public static boolean validateTransaction(String menuPath, Blockchain blockchain, Transaction transaction) throws Exception { 
 		if (isTransaction(transaction))
 		{
 			if(transaction.getSenderPublicKey() == transaction.getReceiverPublicKey()) throw new Exception("Cannot transfer to the same public key");
 			try {
-				PublicKey blockchainKey = Encryption.readBlokChainKey();
+				PublicKey blockchainKey = Encryption.readBlockchainKey();
 				if (transaction.getSenderPublicKey() != blockchainKey) {
 					if(!Encryption.verifySignature(transaction.toString(), transaction.getSignature(), transaction.getSenderPublicKey())) throw new Exception("Invalid Signature");
 				}
-				if (transaction.getTokenAmount() > searchForTokens(blockChain, transaction.getSenderPublicKey())) throw new Exception("Insuficient balance");
+				if (transaction.getTokenAmount() > searchForTokens(menuPath + " > Validate Transaction", blockchain, transaction.getSenderPublicKey())) throw new Exception("Insuficient balance");
 			} catch (IOException e) {
-				System.out.println("[X] BlockChain's public key not found.");
+				Simple.banner(menuPath + " > Validate Transaction (error)");
+				System.out.println("[X] Blockchain's public key not found.");
 			} catch (Exception e) {
-				Simple.banner();
+				Simple.banner(menuPath + " > Validate Transaction (error)");
 				System.out.println("[X]" + e.getMessage());
 			}
 			return true;
@@ -214,28 +236,43 @@ public class App {
 		return false;
 	} 
 
+	// Will add fees to transactions
+
+	private static Transaction addFee(Transaction transaction, PublicKey minerPublicKey) {
+		return new Transaction(transaction, transaction.getSenderPublicKey(), minerPublicKey, (transaction.getTokenAmount() / 100), null, true);
+	}
+
 	// Will merge the transactions into a single Array
-	public static Transaction[] mergeTransactions(BlockChain blockChain, Transaction head) throws Exception{
+	public static Transaction[] mergeTransactions(String menuPath, Blockchain blockchain, Transaction head, PublicKey minerPublicKey) throws Exception{
 		Transaction aux = head;
 		int validLength = 0;
 
 		if(head != null) {
-			if(validateTransaction(blockChain, aux)) validLength++;
+			if(validateTransaction(menuPath, blockchain, aux)) validLength++;
 			while (aux.getPrevious() != null) {
 				aux = aux.getPrevious(); 
-				if(validateTransaction(blockChain, aux)) validLength++;
+				if(validateTransaction(menuPath, blockchain, aux)) validLength++;
 			}
 		}
 
-		Transaction[] data = new Transaction[validLength];
+		Transaction[] data = new Transaction[validLength * 2];
 		aux = head;
 		int counter = 0;
 		if(head != null) {
-			if(validateTransaction(blockChain, aux)) data[counter] = aux;
+			if(validateTransaction(menuPath, blockchain, aux)) {
+				data[counter] = aux;
+				data[counter + 1] = addFee(aux, minerPublicKey);
+				counter++;
+			}
 			while (aux.getPrevious() != null) {
 				aux = aux.getPrevious();
 				counter++;
-				if(validateTransaction(blockChain, aux)) data[counter] = aux;
+				if(validateTransaction(menuPath, blockchain, aux)) {
+					data[counter] = aux;
+					data[counter + 1] = addFee(aux, minerPublicKey);
+					counter++;
+				}
+				
 			}
 		}
 		return data;

@@ -1,35 +1,41 @@
-package classes.io;
+package io;
 
-import classes.core.App;
-import classes.core.Block;
-import classes.core.BlockChain;
-import classes.core.Transaction;
-import classes.other.Log;
+import core.App;
+import core.Block;
+import core.Blockchain;
 
-public class Submenus extends Controllers{
-	protected boolean transactionSubmenu(BlockChain blockChain, Log log) {
-        Simple.menuBanner();
+import other.Log;
+import other.Calculator;
+
+import io.Controllers.*;
+
+public class Submenus {
+    double calculatorResult = 0; // Displayed when using calculator
+
+    // Case 1:
+	protected boolean transactionSubmenu(String menuPath, String defaultDirectory, Blockchain blockchain, Log log) {
+        menuPath += " > Transactions";
+        Simple.banner(menuPath);
         System.out.print("""
-                        [Menu > Transactions    ] ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
                         [1] Transfer
                         [2] See tokens
                         [3] Go back
                         """);
         switch (Simple.intInput(1, 3)) {
             case 1:
-                Simple.banner();
+                Simple.banner(menuPath + " > Transfer");
                 log.start();
-                boolean sucessful = userAddTransaction(blockChain);
+                boolean sucessful = Transferring.userAddTransaction(menuPath, defaultDirectory, blockchain);
                 if (sucessful) log.addToLog("Added Transaction", log.finish());
                 if (sucessful) System.out.println("[!] Your Transaction has been added to the transactions layer and Can be added in the next block after being validated");
                 Simple.pause();
                 return true;
             case 2:
-                Simple.banner();
-                System.out.println("[!] Type the hash of a public key (Can be viewed in the BlockChain)");
-                String pk = Simple.strInput(12);
+                Simple.banner("Menu > Transactions > See tokens");
+                System.out.println("[!] Paste the hash of a public key (Can be viewed in the Blockchain)");
+                String pk = Simple.strInput(30);
                 log.start();
-                System.out.println("[!] Found " + App.searchForTokens(blockChain, pk) + " tokens for this public key.");
+                System.out.println("[!] Found " + App.searchForTokens("Menu > Transactions > See tokens", blockchain, pk) + " tokens for this public key.");
                 log.addToLog("Searched tokens", log.finish());
                 Simple.pause();
                 return true;
@@ -38,11 +44,31 @@ public class Submenus extends Controllers{
         }
     }
 
-    protected boolean viewingSubmenu(BlockChain blockChain, Log log) {
-        Simple.menuBanner();
+    // Case 2:
+    protected boolean miningSubmenu(String menuPath, String defaultDirectory, Blockchain blockchain, Log log) {
+        menuPath += " > Mining";
+        Simple.banner(menuPath);
         System.out.print("""
-                        [Menu > Viewing         ] ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                        [1] View BlockChain
+            [1] Mine a Block
+            [2] Go back
+            """); // More options soon
+        System.out.println("[!] Current difficulty: " + blockchain.difficulty());
+        System.out.println("[!] Current reward:" + blockchain.reward());
+        switch (Simple.intInput(1, 2)) {
+            case 1:
+                Mining.userMine(menuPath, defaultDirectory, blockchain, log);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Case 3:
+    protected boolean viewingSubmenu(String menuPath, Blockchain blockchain, Log log) {
+        menuPath += " > Viewing";
+        Simple.banner(menuPath);
+        System.out.print("""
+                        [1] View Blockchain
                         [2] View a specific block
                         [3] View transactions
                         [4] See tokens
@@ -50,33 +76,33 @@ public class Submenus extends Controllers{
                         """);
         switch (Simple.intInput(1, 5)) {
             case 1:
-                Simple.banner();
+                Simple.banner(menuPath + " > View Blockchain");
                 try {
-                    App.validateBlockChain(blockChain);
+                    App.validateBlockchain(blockchain);
                     log.start();
-                    Print.BlockChain(blockChain);
-                    log.addToLog("Printed BlockChain", log.finish());
+                    Print.PrintBlockchain(blockchain);
+                    log.addToLog("Printed Blockchain", log.finish());
                     
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
-                    if(Simple.userConfirmation("[?] Continue anyways? ")) {
+                    if(Simple.userConfirmation("Continue anyways? ")) {
                         log.start();
-                        Print.BlockChain(blockChain);
-                        log.addToLog("printed BlockChain", log.finish());
+                        Print.PrintBlockchain(blockchain);
+                        log.addToLog("printed Blockchain", log.finish());
                         
                     }
                     else {
-                        Simple.banner();
+                        Simple.banner(menuPath +" (aborted)");
                         System.out.println("[!] Operation aborted.");
                     }
                 }
                 Simple.pause();
                 return true;
             case 2:
-                Simple.banner();
+                Simple.banner(menuPath);
                 try {
-                    App.validateBlockChain(blockChain);
-                    userPrintBlock(blockChain);
+                    App.validateBlockchain(blockchain);
+                    Viewing.userPrintBlock(menuPath, blockchain);
                     
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -84,26 +110,15 @@ public class Submenus extends Controllers{
                 Simple.pause();
                 return true;
             case 3:
-                int counter = 0;
-                Simple.banner();
-                System.out.println("Showing all transactions: ");
-                if(blockChain.getTransactionHead() != null) {
-                    counter = 1;
-                    Transaction aux = blockChain.getTransactionHead();
-                    System.out.println("[" + counter + "] " + aux);
-                    while (aux.getPrevious() != null) {
-                        aux = aux.getPrevious(); 
-                        System.out.println("[" + counter + "] " + aux);
-                    }
-                }
+                Viewing.userPrintTransactions(menuPath, blockchain);
                 Simple.pause();
                 return true;
             case 4:
-                Simple.banner();
-                System.out.println("[!] Type the hash of a public key (Can be viewed on the BlockChain)");
-                String pk = Simple.strInput(12);
+                Simple.banner("Menu > Viewing > View Tokens");
+                System.out.println("[!] Paste the hash of a public key (Can be viewed on the Blockchain)");
+                String pk = Simple.strInput(30);
                 log.start();
-                System.out.println("[!] Found " + App.searchForTokens(blockChain, pk) + " tokens for this public key.");
+                System.out.println("[!] Found " + App.searchForTokens("Menu > Viewing > View Tokens", blockchain, pk) + " tokens for this public key.");
                 log.addToLog("Searched tokens", log.finish());
                 Simple.pause();
                 return true;
@@ -112,28 +127,29 @@ public class Submenus extends Controllers{
         }
     }
 
-    protected boolean logSubmenu(Log log) {
-        Simple.menuBanner();
+    // Case 4:
+    protected boolean logSubmenu(String menuPath, Log log) {
+        menuPath += " > Log";
+        Simple.banner(menuPath);
         System.out.print("""
-                        [Menu > Log             ] ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
                         [1] View log
                         [2] Clear log
                         [3] Go back
                         """);
         switch (Simple.intInput(1, 3)) {
             case 1:
-                Simple.banner();
+                Simple.banner(menuPath + " > View Log");
                 log.printLog();
                 Simple.pause();
                 return true;
             case 2:
-                if(Simple.userConfirmation("[?] Do you really want to clear you log?")) {
+                if(Simple.userConfirmation("Do you really want to clear you log?")) {
                     log = new Log();
-                    Simple.banner();
+                    Simple.banner(menuPath + " > Clear Log");
                     System.out.println("[!] Cleared log sucessfully");
                 }
                 else {
-                    Simple.banner();
+                    Simple.banner(menuPath + " > Clear Log (aborted)");
                     System.out.println("[!] Operation aborted");
                 }
                 Simple.pause();
@@ -143,36 +159,96 @@ public class Submenus extends Controllers{
         }
     }
 
-    protected boolean testingSubmenu(BlockChain blockChain, Log log) {
-        Simple.menuBanner();
+    // Case 5
+    protected boolean calculatorSubmenu(String menuPath) {
+        menuPath += "> Calculator";
+        Calculator calculator = new Calculator();
+        Simple.banner(menuPath + " > Result: " + calculatorResult);
         System.out.print("""
-                        [Menu > Testing         ] ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                        [1] Reset BlockChain
+                        [1] Calculate
+                        [2] Reset
+                        [3] Go back
+                        """);
+        switch (Simple.intInput(1, 3)) {
+            case 1:
+                Simple.banner(menuPath);
+                calculatorResult = calculator.calcUsingPreviousResult("Menu", calculatorResult);
+                Simple.pause();
+                return true;
+            case 2:
+                calculatorResult = 0;
+                Simple.banner(menuPath);
+                System.out.println("[!] Resetted");
+                return true;
+            default:
+                return false;
+        }
+    }
+    
+    // Case 6
+    protected boolean testingSubmenu(String menuPath, String defaultDirectory, Blockchain blockchain, Log log) {
+        menuPath += " > Testing";
+        Simple.banner(menuPath);
+        System.out.print("""
+                        [1] Reset Blockchain
                         [2] Modify Block
                         [3] Recalculate Block's Hash
                         [4] Go back
                         """);
         switch (Simple.intInput(1, 4)) {
             case 1:
-                blockChain = new BlockChain();
+                blockchain = new Blockchain();
                 log.start();
                 System.out.println("[!] Resetted sucesfully.");
                 log.addToLog("Resetted", log.finish());
                 Simple.pause();
                 return true;
             case 2:
-                Simple.banner();
-                Block modifiedBlock = userModifyBlock(blockChain);
+                Simple.banner(menuPath + " > Modify Block");
+                Block modifiedBlock = Testing.userModifyBlock(menuPath, defaultDirectory, blockchain);
                 if (modifiedBlock != null) {
-                    Simple.banner();
+                    Simple.banner(menuPath + " > Modify Block");
                     System.out.println("[!] Block modified sucessfully!");
                     log.addToLog("Modified Block", log.finish());
                 }
                 Simple.pause();
                 return true;
             case 3:
-                userReMineHash(blockChain);
+                Testing.userReMineHash("Menu > Testing", blockchain);
                 Simple.pause();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Case 7
+    protected boolean keySubmenu(String menuPath, String defaultDirectory, Log log) {
+        menuPath += " > Keys";
+        Simple.banner(menuPath);
+        System.out.print("""
+                        [1] View  All Keys
+                        [2] Create Key Pair
+                        [3] Delete a Public Key
+                        [4] Delete a Private key
+                        [5] Go back
+                        """);
+        switch (Simple.intInput(1, 5)) {
+            case 1:
+                KeyManaging.userViewPublicKeys(menuPath, defaultDirectory, true);
+                System.out.println();
+                KeyManaging.userViewPrivateKeys(menuPath, defaultDirectory, false);
+                Simple.pause();
+                return true;
+            case 2:
+                KeyManaging. userCreateKeyPair(menuPath, defaultDirectory);
+                Simple.pause();
+                return true;
+            case 3:
+                KeyManaging.userDeletePublicKey(menuPath, defaultDirectory);
+                return true;
+            case 4:
+                KeyManaging.userDeletePrivateKey(menuPath, defaultDirectory);
                 return true;
             default:
                 return false;

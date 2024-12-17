@@ -1,10 +1,10 @@
-package classes.core;
+package core;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 
-import classes.io.Simple;
+import io.Simple;
 
 public class Block {
 	private int id;
@@ -12,12 +12,14 @@ public class Block {
 	private String hash, previousHash;
 	private Block previous;
 	private Transaction[] data;
+	private final long timestamp;
 
 	public Block(Block previous, int id, double nonce, Transaction[] data) {
 		this.previous = previous;
 		this.nonce = nonce;
 		this.id = id;
 		this.data = data;
+		this.timestamp = System.currentTimeMillis()/1000;
 
 		try {
 			var md = MessageDigest.getInstance("SHA-256");
@@ -60,6 +62,10 @@ public class Block {
 		return this.nonce;
 	}
 
+	public long getTimestamp() {
+		return timestamp;
+	}
+
 	@Override
 	public String toString() {
 		String converted = "";
@@ -68,7 +74,7 @@ public class Block {
 		return (converted + this.id + this.nonce + this.previousHash);
 	}
 
-	// For testing ########################
+	// For testing ##########################################################
 
 	public void setData(Transaction[] data) {
 		this.data = data;

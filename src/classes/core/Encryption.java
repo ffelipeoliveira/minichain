@@ -1,6 +1,7 @@
-package classes.core;
+package core;
 
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -25,6 +26,24 @@ import java.security.Key;
 
 public class Encryption {
 
+	//Get the SHA 256 code from a string or object
+	public static String hashCode(String str) {
+		try {
+			var md = MessageDigest.getInstance("SHA-256");
+			md.update(str.getBytes(StandardCharsets.UTF_8));
+			return Base64.getEncoder().encodeToString(md.digest()).toString();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	//Get the hash of a public Key
+	public static String calculateKeyHash(PublicKey publicKey) throws Exception {
+		var md = MessageDigest.getInstance("SHA-256");
+		md.update(publicKey.toString().getBytes(StandardCharsets.UTF_8));
+		return Base64.getEncoder().encodeToString(md.digest());
+	}
+
 	// Can generate a key pair
 	// A key pair consists of a Public key (which anybody can see) and a private key (should be kept private)
 	// It uses EC encryption algorithm, the same one from Bitcoin (I guess)
@@ -37,13 +56,13 @@ public class Encryption {
 	}
 
 	// Can store a key pair
-	// It will store in separate files, to simulate what happens in a real BlockChain
+	// It will store in separate files, to simulate what happens in a real Blockchain
 	// Also the default folder is ./keys/ every key must be stored in it
-	public static void storeKeys(KeyPair keyPair)  throws Exception {
-		FileOutputStream fos = new FileOutputStream("./keys/myPublic.key");
+	public static void storeKeys(String defaultFolder, KeyPair keyPair)  throws Exception {
+		FileOutputStream fos = new FileOutputStream(defaultFolder + "myPublic.key");
 		fos.write(keyPair.getPublic().getEncoded());
 		fos.close();
-		fos = new FileOutputStream("./keys/myPrivate.key");
+		fos = new FileOutputStream(defaultFolder + "myPrivate.key");
 		fos.write(keyPair.getPrivate().getEncoded());
 		fos.close();
 	}
@@ -51,18 +70,18 @@ public class Encryption {
 	// Overloading of the storeKey method for generating more than one pair of keys.
 	// With this you can store keys with different names
 	// It also separates the key in private and public keys
-	public static void storeKeys(KeyPair keyPair, String path)  throws Exception {
-		FileOutputStream fos = new FileOutputStream("./keys/" + path + "Public.key");
+	public static void storeKeys(String defaultFolder, KeyPair keyPair, String fileName)  throws Exception {
+		FileOutputStream fos = new FileOutputStream(defaultFolder + fileName + "Public.key");
 		fos.write(keyPair.getPublic().getEncoded());
 		fos.close();
-		fos = new FileOutputStream("./keys/" + path  + "Private.key");
+		fos = new FileOutputStream(defaultFolder + fileName  + "Private.key");
 		fos.write(keyPair.getPrivate().getEncoded());
 		fos.close();
 	}
 
 	// Can read a Public key file
-	public static PublicKey readPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File("./keys/myPublic.key");
+	public static PublicKey readPublicKey(String defaultFolder) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File(defaultFolder + "myPublic.key");
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
@@ -70,17 +89,17 @@ public class Encryption {
 	}
 
 	// Overloading of readPublicKey with filename support
-	public static PublicKey readPublicKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File("./keys/" + path + "Public.key");
+	public static PublicKey readPublicKey(String defaultFolder, String fileName) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File(defaultFolder + fileName);
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
 		return keyFactory.generatePublic(publicKeySpec);
 	}
 
-	// Can read the default BlockChainKey
-	public static PublicKey readBlokChainKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File("Blockchain.key");
+	// Can read the default BlockchainKey
+	public static PublicKey readBlockchainKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File("BlockchainPublic.key");
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
@@ -88,8 +107,8 @@ public class Encryption {
 	}
 
 	// Can read a private key file
-	public static PrivateKey readPrivateKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File privateKeyFile = new File("./keys/myPrivate.key");
+	public static PrivateKey readPrivateKey(String defaultFolder) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File privateKeyFile = new File(defaultFolder + "myPrivate.key");
 		byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
@@ -97,8 +116,8 @@ public class Encryption {
 	}
 
 	// Overload of readPrivateKey() with filename support
-	public static PrivateKey readPrivateKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File privateKeyFile = new File("./keys/" + path + "Private.key");
+	public static PrivateKey readPrivateKey(String defaultFolder, String fileName) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File privateKeyFile = new File(defaultFolder + fileName);
 		byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);

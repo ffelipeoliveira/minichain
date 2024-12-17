@@ -1,19 +1,23 @@
-package classes.main;
+package main;
 
-import classes.core.BlockChain;
-import classes.io.Menu;
-import classes.other.Log;
+import core.Blockchain;
+import io.Menu;
+import other.Load;
+import other.Log;
 
 public class Main {
 	public static void main(String[] args) {
         Boolean loop = true;
-        BlockChain blockChain = new BlockChain();
+        Blockchain blockChain = new Blockchain();
         Menu m = new Menu();
         Log log = new Log();
-        
-        // Main loop
+        Load data = new Load();
+
+        if(data.error) return;
+
+        //Main loop
         while(loop) {
-            loop = m.menu(blockChain, log);
+            loop = m.menu(data.DEFAULT_DIRECTORY, blockChain, log);
         }
 	}
 
