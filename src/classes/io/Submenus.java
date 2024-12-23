@@ -15,7 +15,7 @@ public class Submenus {
     double calculatorResult = 0; // Displayed when using calculator
 
     // Case 1:
-    protected boolean transactionSubmenu(String menuPath, String defaultDirectory, Blockchain blockchain, Log log) {
+    protected boolean transactionSubmenu(String menuPath, String defaultKeyDirectory, Blockchain blockchain, Log log) {
         menuPath += " > Transactions";
         Simple.banner(menuPath);
         System.out.print("""
@@ -27,7 +27,7 @@ public class Submenus {
             case 1:
                 Simple.banner(menuPath + " > Transfer");
                 log.start();
-                boolean sucessful = Transferring.userAddTransaction(menuPath, defaultDirectory, blockchain);
+                boolean sucessful = Transferring.userAddTransaction(menuPath, defaultKeyDirectory, blockchain);
                 if (sucessful)
                     log.addToLog("Added Transaction", log.finish());
                 if (sucessful)
@@ -41,7 +41,7 @@ public class Submenus {
                 String pk = Simple.strInput(30);
                 log.start();
                 System.out
-                        .println("[!] Found " + App.searchForTokens("Menu > Transactions > See tokens", blockchain, pk)
+                        .println("[!] Found " + App.searchForTokens("Menu > Transactions > See tokens", defaultKeyDirectory, blockchain, pk)
                                 + " tokens for this public key.");
                 log.addToLog("Searched tokens", log.finish());
                 Simple.pause();
@@ -72,7 +72,7 @@ public class Submenus {
     }
 
     // Case 3:
-    protected boolean viewingSubmenu(String menuPath, Blockchain blockchain, Log log) {
+    protected boolean viewingSubmenu(String menuPath, String defaultKeyDirectory, Blockchain blockchain, Log log) {
         menuPath += " > Viewing";
         Simple.banner(menuPath);
         System.out.print("""
@@ -125,7 +125,7 @@ public class Submenus {
                 System.out.println("[!] Paste the hash of a public key (Can be viewed on the Blockchain)");
                 String pk = Simple.strInput(30);
                 log.start();
-                System.out.println("[!] Found " + App.searchForTokens("Menu > Viewing > View Tokens", blockchain, pk)
+                System.out.println("[!] Found " + App.searchForTokens("Menu > Viewing > View Tokens", defaultKeyDirectory, blockchain, pk)
                         + " tokens for this public key.");
                 log.addToLog("Searched tokens", log.finish());
                 Simple.pause();

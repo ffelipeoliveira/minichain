@@ -30,7 +30,7 @@ public class Menu extends Submenus {
                     ;
                 return true;
             case 3:
-                while (viewingSubmenu(menuPath, blockchain, log))
+                while (viewingSubmenu(menuPath, keyDirectory, blockchain, log))
                     ;
                 return true;
             case 4:

@@ -73,10 +73,10 @@ public class App {
 	// Blockchain Block methods #############################################
 
 	// Save block
-	public static void saveBlock(String defaultBlockDirectory, Block block) {
+	public static void saveBlock(String blockDirectory, Block block) {
 		try {
 			FileOutputStream fileOutputStream = new FileOutputStream(
-					defaultBlockDirectory + "\\block" + block.getId() + ".ser");
+					blockDirectory + "\\block" + block.getId() + ".ser");
 			ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
 			objectOutputStream.writeObject(block);
 			objectOutputStream.close();
@@ -86,10 +86,10 @@ public class App {
 	}
 
 	// Load block
-	public static Block loadBlock(String defaultBlockDirectory, String filename) {
+	public static Block loadBlock(String blockDirectory, String filename) {
 		try {
 			ObjectInputStream objectInputStream = new ObjectInputStream(
-					new FileInputStream(defaultBlockDirectory + "\\" + filename));
+					new FileInputStream(blockDirectory + "\\" + filename));
 			Block restoredBlock = (Block) objectInputStream.readObject();
 			objectInputStream.close();
 			return restoredBlock;
@@ -100,13 +100,13 @@ public class App {
 	}
 
 	// Load Blockchain
-	public static Blockchain loadBlockchain(String defaultBlockDirectory) {
-		Blockchain blockchain = new Blockchain(defaultBlockDirectory);
+	public static Blockchain loadBlockchain(String blockDirectory) {
+		Blockchain blockchain = new Blockchain(blockDirectory);
 		File[] files;
 
 		// If there's no file it'll throw a exception
 		try {
-			files =  new File(defaultBlockDirectory).listFiles();
+			files =  new File(blockDirectory).listFiles();
 		} catch (Exception e) {
 			return blockchain;
 		}
@@ -117,7 +117,7 @@ public class App {
 				int length = fileName.length();
 				if (fileName.charAt(length - 1) == 'r' && fileName.charAt(length - 2) == 'e'
 						&& fileName.charAt(length - 3) == 's' && fileName.charAt(length - 4) == '.') {
-					Block block = loadBlock(defaultBlockDirectory, fileName);
+					Block block = loadBlock(blockDirectory, fileName);
 					if (block != null) {
 						blockchain.addLoadedBlock(block);
 					}
@@ -128,10 +128,10 @@ public class App {
 	}
 
 	// Will try to mine a block
-	public static Block mineBlock(String menuPath, Blockchain blockchain, PublicKey publicKey) throws Exception {
+	public static Block mineBlock(String menuPath, String keyDirectory, Blockchain blockchain, PublicKey publicKey) throws Exception {
 		double nonce = 0;
 		int id = blockchain.length();
-		Transaction[] data = mergeTransactions(menuPath, blockchain, blockchain.getTransactionHead(), publicKey);
+		Transaction[] data = mergeTransactions(menuPath, keyDirectory, blockchain, blockchain.getTransactionHead(), publicKey);
 
 		Block block = new Block(blockchain.getHead(), id, nonce, data);
 		while (!validateHash(blockchain, block)) {
@@ -139,7 +139,7 @@ public class App {
 			block = new Block(blockchain.getHead(), id, nonce, data);
 		}
 
-		blockchain.addBlock(menuPath, block, publicKey);
+		blockchain.addBlock(menuPath, keyDirectory, block, publicKey);
 		return block;
 	}
 
@@ -210,12 +210,12 @@ public class App {
 
 	// Will search through all Blockchain looking for transactions from a specific
 	// public key
-	public static float searchForTokens(String menuPath, Blockchain blockchain, PublicKey senderPublicKey) {
+	public static float searchForTokens(String menuPath, String directory, Blockchain blockchain, PublicKey senderPublicKey) {
 		Block aux = blockchain.getHead();
 		float tokens = 0;
 
 		try {
-			PublicKey blockchainKey = Encryption.readBlockchainKey();
+			PublicKey blockchainKey = Encryption.readBlockchainKey(directory);
 			if (senderPublicKey == blockchainKey)
 				return 21000000;
 		} catch (IOException e) {
@@ -246,12 +246,12 @@ public class App {
 	// Overloading for better user experience
 	// Instead of loading a public key for searching, you can simply type the
 	// hashcode
-	public static float searchForTokens(String menuPath, Blockchain blockchain, String hashOfSenderPK) {
+	public static float searchForTokens(String menuPath, String directory, Blockchain blockchain, String hashOfSenderPK) {
 		Block aux = blockchain.getHead();
 		float tokens = 0;
 
 		try {
-			PublicKey blockchainKey = Encryption.readBlockchainKey();
+			PublicKey blockchainKey = Encryption.readBlockchainKey(directory);
 			if (hashOfSenderPK.equals(Encryption.calculateKeyHash(blockchainKey)))
 				return 21000000;
 		} catch (IOException e) {
@@ -294,19 +294,19 @@ public class App {
 	}
 
 	// Will check if the transaction can be done
-	public static boolean validateTransaction(String menuPath, Blockchain blockchain, Transaction transaction)
+	public static boolean validateTransaction(String menuPath, String directory, Blockchain blockchain, Transaction transaction)
 			throws Exception {
 		if (isTransaction(transaction)) {
 			if (transaction.getSenderPublicKey() == transaction.getReceiverPublicKey())
 				throw new Exception("Cannot transfer to the same public key");
 			try {
-				PublicKey blockchainKey = Encryption.readBlockchainKey();
+				PublicKey blockchainKey = Encryption.readBlockchainKey(directory);
 				if (transaction.getSenderPublicKey() != blockchainKey) {
 					if (!Encryption.verifySignature(transaction.toString(), transaction.getSignature(),
 							transaction.getSenderPublicKey()))
 						throw new Exception("Invalid Signature");
 				}
-				if (transaction.getTokenAmount() > searchForTokens(menuPath + " > Validate Transaction", blockchain,
+				if (transaction.getTokenAmount() > searchForTokens(menuPath + " > Validate Transaction", directory, blockchain,
 						transaction.getSenderPublicKey()))
 					throw new Exception("Insuficient balance");
 			} catch (IOException e) {
@@ -329,17 +329,17 @@ public class App {
 	}
 
 	// Will merge the transactions into a single Array
-	public static Transaction[] mergeTransactions(String menuPath, Blockchain blockchain, Transaction head,
+	public static Transaction[] mergeTransactions(String menuPath, String keyDirectory, Blockchain blockchain, Transaction head,
 			PublicKey minerPublicKey) throws Exception {
 		Transaction aux = head;
 		int validLength = 0;
 
 		if (head != null) {
-			if (validateTransaction(menuPath, blockchain, aux))
+			if (validateTransaction(menuPath, keyDirectory, blockchain, aux))
 				validLength++;
 			while (aux.getPrevious() != null) {
 				aux = aux.getPrevious();
-				if (validateTransaction(menuPath, blockchain, aux))
+				if (validateTransaction(menuPath, keyDirectory, blockchain, aux))
 					validLength++;
 			}
 		}
@@ -348,7 +348,7 @@ public class App {
 		aux = head;
 		int counter = 0;
 		if (head != null) {
-			if (validateTransaction(menuPath, blockchain, aux)) {
+			if (validateTransaction(menuPath, keyDirectory,  blockchain, aux)) {
 				data[counter] = aux;
 				data[counter + 1] = addFee(aux, minerPublicKey);
 				counter++;
@@ -356,7 +356,7 @@ public class App {
 			while (aux.getPrevious() != null) {
 				aux = aux.getPrevious();
 				counter++;
-				if (validateTransaction(menuPath, blockchain, aux)) {
+				if (validateTransaction(menuPath, keyDirectory, blockchain, aux)) {
 					data[counter] = aux;
 					data[counter + 1] = addFee(aux, minerPublicKey);
 					counter++;

@@ -51,7 +51,7 @@ public class Mining {
                 return false;
             }
 
-            Block block = App.mineBlock(menuPath, blockChain, minerPublicKey);
+            Block block = App.mineBlock(menuPath, defaultKeyDirectory, blockChain, minerPublicKey);
 
             Simple.banner(menuPath);
             System.out.println("[!] Block sucessfully mined! Nonce was " + block.getNonce()

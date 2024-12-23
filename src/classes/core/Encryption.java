@@ -60,11 +60,11 @@ public class Encryption {
 	// It will store in separate files, to simulate what happens in a real
 	// Blockchain
 	// Also the default Directory is ./keys/ every key must be stored in it
-	public static void storeKeys(String defaultDirectory, KeyPair keyPair) throws Exception {
-		FileOutputStream fos = new FileOutputStream(defaultDirectory + "myPublic.key");
+	public static void storeKeys(String keyDirectory, KeyPair keyPair) throws Exception {
+		FileOutputStream fos = new FileOutputStream(keyDirectory + "myPublic.key");
 		fos.write(keyPair.getPublic().getEncoded());
 		fos.close();
-		fos = new FileOutputStream(defaultDirectory + "myPrivate.key");
+		fos = new FileOutputStream(keyDirectory + "myPrivate.key");
 		fos.write(keyPair.getPrivate().getEncoded());
 		fos.close();
 	}
@@ -72,19 +72,19 @@ public class Encryption {
 	// Overloading of the storeKey method for generating more than one pair of keys.
 	// With this you can store keys with different names
 	// It also separates the key in private and public keys
-	public static void storeKeys(String defaultDirectory, KeyPair keyPair, String fileName) throws Exception {
-		FileOutputStream fos = new FileOutputStream(defaultDirectory + fileName + "Public.key");
+	public static void storeKeys(String keyDirectory, KeyPair keyPair, String fileName) throws Exception {
+		FileOutputStream fos = new FileOutputStream(keyDirectory + fileName + "Public.key");
 		fos.write(keyPair.getPublic().getEncoded());
 		fos.close();
-		fos = new FileOutputStream(defaultDirectory + fileName + "Private.key");
+		fos = new FileOutputStream(keyDirectory + fileName + "Private.key");
 		fos.write(keyPair.getPrivate().getEncoded());
 		fos.close();
 	}
 
 	// Can read a Public key file
-	public static PublicKey readPublicKey(String defaultDirectory)
+	public static PublicKey readPublicKey(String keyDirectory)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File(defaultDirectory + "myPublic.key");
+		File publicKeyFile = new File(keyDirectory + "myPublic.key");
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
@@ -92,18 +92,23 @@ public class Encryption {
 	}
 
 	// Overloading of readPublicKey with filename support
-	public static PublicKey readPublicKey(String defaultDirectory, String fileName)
+	public static PublicKey readPublicKey(String keyDirectory, String fileName)
 			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File(defaultDirectory + fileName);
+		File publicKeyFile = new File(keyDirectory + fileName);
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
 		return keyFactory.generatePublic(publicKeySpec);
 	}
 
+	//Can generate BlockchainKey
+	public static void generateBlockchainKey(String keyDirectory) throws Exception {
+		storeKeys(keyDirectory, generateKeyPair(), "Blockchain");
+	}
+
 	// Can read the default BlockchainKey
-	public static PublicKey readBlockchainKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File("BlockchainPublic.key");
+	public static PublicKey readBlockchainKey(String keyDirectory) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File(keyDirectory + "BlockchainPublic.key");
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);

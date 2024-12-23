@@ -25,10 +25,10 @@ public class Blockchain {
 
 	// Can set a block as the head, reset transactions and set the reward for the
 	// miner on the next block
-	public void addBlock(String menuPath, Block block, PublicKey minerPublicKey) {
+	public void addBlock(String menuPath, String directory, Block block, PublicKey minerPublicKey) {
 		this.head = block;
 		try {
-			PublicKey blockchainKey = Encryption.readBlockchainKey();
+			PublicKey blockchainKey = Encryption.readBlockchainKey(directory);
 			this.transactionHead = new Transaction(null, blockchainKey, minerPublicKey, reward(), null, false);
 		} catch (IOException e) {
 			System.out.println("[X] BlockChain's public key not found.");
