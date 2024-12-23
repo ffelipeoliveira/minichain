@@ -26,7 +26,7 @@ import java.security.Key;
 
 public class Encryption {
 
-	//Get the SHA 256 code from a string or object
+	// Get the SHA 256 code from a string or object
 	public static String hashCode(String str) {
 		try {
 			var md = MessageDigest.getInstance("SHA-256");
@@ -37,7 +37,7 @@ public class Encryption {
 		}
 	}
 
-	//Get the hash of a public Key
+	// Get the hash of a public Key
 	public static String calculateKeyHash(PublicKey publicKey) throws Exception {
 		var md = MessageDigest.getInstance("SHA-256");
 		md.update(publicKey.toString().getBytes(StandardCharsets.UTF_8));
@@ -45,7 +45,8 @@ public class Encryption {
 	}
 
 	// Can generate a key pair
-	// A key pair consists of a Public key (which anybody can see) and a private key (should be kept private)
+	// A key pair consists of a Public key (which anybody can see) and a private key
+	// (should be kept private)
 	// It uses EC encryption algorithm, the same one from Bitcoin (I guess)
 	public static KeyPair generateKeyPair() throws Exception {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
@@ -56,13 +57,14 @@ public class Encryption {
 	}
 
 	// Can store a key pair
-	// It will store in separate files, to simulate what happens in a real Blockchain
-	// Also the default folder is ./keys/ every key must be stored in it
-	public static void storeKeys(String defaultFolder, KeyPair keyPair)  throws Exception {
-		FileOutputStream fos = new FileOutputStream(defaultFolder + "myPublic.key");
+	// It will store in separate files, to simulate what happens in a real
+	// Blockchain
+	// Also the default Directory is ./keys/ every key must be stored in it
+	public static void storeKeys(String defaultDirectory, KeyPair keyPair) throws Exception {
+		FileOutputStream fos = new FileOutputStream(defaultDirectory + "myPublic.key");
 		fos.write(keyPair.getPublic().getEncoded());
 		fos.close();
-		fos = new FileOutputStream(defaultFolder + "myPrivate.key");
+		fos = new FileOutputStream(defaultDirectory + "myPrivate.key");
 		fos.write(keyPair.getPrivate().getEncoded());
 		fos.close();
 	}
@@ -70,18 +72,19 @@ public class Encryption {
 	// Overloading of the storeKey method for generating more than one pair of keys.
 	// With this you can store keys with different names
 	// It also separates the key in private and public keys
-	public static void storeKeys(String defaultFolder, KeyPair keyPair, String fileName)  throws Exception {
-		FileOutputStream fos = new FileOutputStream(defaultFolder + fileName + "Public.key");
+	public static void storeKeys(String defaultDirectory, KeyPair keyPair, String fileName) throws Exception {
+		FileOutputStream fos = new FileOutputStream(defaultDirectory + fileName + "Public.key");
 		fos.write(keyPair.getPublic().getEncoded());
 		fos.close();
-		fos = new FileOutputStream(defaultFolder + fileName  + "Private.key");
+		fos = new FileOutputStream(defaultDirectory + fileName + "Private.key");
 		fos.write(keyPair.getPrivate().getEncoded());
 		fos.close();
 	}
 
 	// Can read a Public key file
-	public static PublicKey readPublicKey(String defaultFolder) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File(defaultFolder + "myPublic.key");
+	public static PublicKey readPublicKey(String defaultDirectory)
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File(defaultDirectory + "myPublic.key");
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
@@ -89,8 +92,9 @@ public class Encryption {
 	}
 
 	// Overloading of readPublicKey with filename support
-	public static PublicKey readPublicKey(String defaultFolder, String fileName) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File(defaultFolder + fileName);
+	public static PublicKey readPublicKey(String defaultDirectory, String fileName)
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File(defaultDirectory + fileName);
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
@@ -107,8 +111,9 @@ public class Encryption {
 	}
 
 	// Can read a private key file
-	public static PrivateKey readPrivateKey(String defaultFolder) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File privateKeyFile = new File(defaultFolder + "myPrivate.key");
+	public static PrivateKey readPrivateKey(String defaultDirectory)
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File privateKeyFile = new File(defaultDirectory + "myPrivate.key");
 		byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
@@ -116,8 +121,9 @@ public class Encryption {
 	}
 
 	// Overload of readPrivateKey() with filename support
-	public static PrivateKey readPrivateKey(String defaultFolder, String fileName) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File privateKeyFile = new File(defaultFolder + fileName);
+	public static PrivateKey readPrivateKey(String defaultDirectory, String fileName)
+			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File privateKeyFile = new File(defaultDirectory + fileName);
 		byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
@@ -135,11 +141,11 @@ public class Encryption {
 	public static String decryptString(Key privateKey, String string) throws Exception {
 		Cipher decryptCipher = Cipher.getInstance("SHA256withECDSA");
 		decryptCipher.init(Cipher.DECRYPT_MODE, privateKey);
-		return new String( decryptCipher.doFinal(string.getBytes()), StandardCharsets.UTF_8);
+		return new String(decryptCipher.doFinal(string.getBytes()), StandardCharsets.UTF_8);
 	}
 
 	// Can sign a transaction using a private key
-	public static String signTransaction(String transactionData,  PrivateKey privateKey) throws Exception {
+	public static String signTransaction(String transactionData, PrivateKey privateKey) throws Exception {
 		Signature signature = Signature.getInstance("SHA256withECDSA");
 		signature.initSign(privateKey);
 		signature.update(transactionData.getBytes("UTF-8"));
@@ -156,4 +162,3 @@ public class Encryption {
 		return verifier.verify(decodedSignature);
 	}
 }
-

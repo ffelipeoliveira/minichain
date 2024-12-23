@@ -1,12 +1,15 @@
 package core;
 
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
-
+import java.io.Serializable;
 import io.Simple;
 
-public class Block {
+
+
+public class Block implements Serializable {
 	private int id;
 	private double nonce;
 	private String hash, previousHash;
@@ -19,20 +22,19 @@ public class Block {
 		this.nonce = nonce;
 		this.id = id;
 		this.data = data;
-		this.timestamp = System.currentTimeMillis()/1000;
+		this.timestamp = System.currentTimeMillis() / 1000;
 
 		try {
 			var md = MessageDigest.getInstance("SHA-256");
 			if (this.previous != null) {
 				md.update(this.previous.toString().getBytes(StandardCharsets.UTF_8));
-			 	this.previousHash = Base64.getEncoder().encodeToString(md.digest());
-			}
-			else this.previousHash = null;
+				this.previousHash = Base64.getEncoder().encodeToString(md.digest());
+			} else
+				this.previousHash = null;
 			md.update(this.toString().getBytes(StandardCharsets.UTF_8));
 			this.hash = Base64.getEncoder().encodeToString(md.digest());
-			
-		}
-		catch (Exception e) {
+
+		} catch (Exception e) {
 			System.err.println(e);
 			Simple.pause();
 		}
@@ -70,7 +72,7 @@ public class Block {
 	public String toString() {
 		String converted = "";
 		for (Transaction transaction : this.data)
-			converted+=(transaction.toString());
+			converted += (transaction.toString());
 		return (converted + this.id + this.nonce + this.previousHash);
 	}
 

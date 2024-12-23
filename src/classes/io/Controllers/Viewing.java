@@ -9,9 +9,9 @@ import io.Simple;
 import io.Print;
 
 public class Viewing {
-    
+
     // Case 1 is a direct reference to the Print.printBlockchain() method
-    
+
     // Case 2
     // Can manage the App's searchBlock()
     public static void userPrintBlock(String menuPath, Blockchain blockChain) {
@@ -33,12 +33,12 @@ public class Viewing {
         Simple.banner(menuPath + " > View all transactions");
         int counter = 0;
         System.out.println("Showing all transactions: ");
-        if(blockchain.getTransactionHead() != null) {
+        if (blockchain.getTransactionHead() != null) {
             counter = 1;
             Transaction aux = blockchain.getTransactionHead();
             System.out.println("[" + counter + "] " + aux);
             while (aux.getPrevious() != null) {
-                aux = aux.getPrevious(); 
+                aux = aux.getPrevious();
                 System.out.println("[" + counter + "] " + aux);
             }
         }

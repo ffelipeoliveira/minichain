@@ -1,9 +1,9 @@
 package core;
 
 import java.security.PublicKey;
+import java.io.Serializable;
 
-
-public class Transaction {
+public class Transaction implements Serializable{
 	private final Transaction previous;
 	private String data;
 	private String signature;
@@ -20,7 +20,8 @@ public class Transaction {
 		this.timestamp = System.currentTimeMillis();
 	}
 
-	public Transaction(Transaction previous, PublicKey senderPublicKey, PublicKey receiverPublicKey, float tokenAmount, String signature, boolean isFee) {
+	public Transaction(Transaction previous, PublicKey senderPublicKey, PublicKey receiverPublicKey, float tokenAmount,
+			String signature, boolean isFee) {
 		this.previous = previous;
 		this.senderPublicKey = senderPublicKey;
 		this.receiverPublicKey = receiverPublicKey;
@@ -80,7 +81,10 @@ public class Transaction {
 
 	@Override
 	public String toString() {
-		if (data == null) return ("(" + (tokenAmount - tokenAmount/100) + ") " + senderPublicKey.hashCode() + "=>" + receiverPublicKey.hashCode() + timestamp);
-		else return data + timestamp;
+		if (data == null)
+			return ("(" + (tokenAmount - tokenAmount / 100) + ") " + senderPublicKey.hashCode() + "=>"
+					+ receiverPublicKey.hashCode() + timestamp);
+		else
+			return data + timestamp;
 	}
 }

@@ -1,3 +1,14 @@
+### Ver 0.2c report
+I now added block saving using java's serialization
+Also I organized a bit more the file management
+Keys are now stored on Documents/minichain/keys and blocks on Documents/minichain/blockchain which I think it's easier to understand
+Also I did some debugging and organized the code some more.
+The calculator still a bit unprevisible when calculating long expressions. I sincerely don't know what to do
+All changes are basically just that tbh, which is kinda underwhelming
+On the bright side, I'm on my way to the final steps of the development of this project, closer than further.
+Now I want to make a p2p local network using some kind of tcp server, implement the unforking & implement the string cryptography
+I'm not satisfied with the way things are organized now either. It still very unfriendly. I'll strive for better code and a cleaner workspace.
+
 ### Ver 0.2b report
 Keys are now stored under Documents/minichain_keys/ for better acessibility
 Your public and private keys are not automaticaly loaded and created if it doesn't exist yet

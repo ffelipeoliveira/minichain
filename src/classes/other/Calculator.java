@@ -76,9 +76,9 @@ public class Calculator {
 
 	// The method will build the expression and and operator array.
 	// Afterwards it will search for the index of each operator to see which one
-	// will come first. 
+	// will come first.
 
-	private double calc(String expression) throws Exception{
+	private double calc(String expression) throws Exception {
 		reset();
 		String operands[] = buildCalc(expression);
 		operatorsNotUsed = operators.toCharArray();
@@ -98,7 +98,6 @@ public class Calculator {
 				dequeueOperand(operands, indexExponentiation + 1);
 				queuedOperations--;
 				dequeueOperator(indexExponentiation);
-
 
 			} else if (indexSquareRoot != -1) {
 				operands[indexSquareRoot] = "" + (Math.sqrt(Double.parseDouble(operands[indexSquareRoot])));
@@ -124,7 +123,8 @@ public class Calculator {
 
 			} else if (indexAddition != -1 && (indexAddition < indexSubtraction || indexSubtraction == -1)) {
 				operands[indexAddition] = ""
-						+ (Double.parseDouble(operands[indexAddition]) + Double.parseDouble(operands[indexAddition + 1]));
+						+ (Double.parseDouble(operands[indexAddition])
+								+ Double.parseDouble(operands[indexAddition + 1]));
 				dequeueOperand(operands, indexAddition + 1);
 				queuedOperations--;
 				dequeueOperator(indexAddition);
@@ -145,7 +145,7 @@ public class Calculator {
 	// The Split method divide the String where there's (), removing all
 	// parenthesis in the process
 
-	public double calcExpression(String expression) throws Exception{
+	public double calcExpression(String expression) throws Exception {
 		String operands[] = expression.replaceAll("\\(", "\\(f").split("([()])");
 		expression = "";
 
@@ -155,7 +155,7 @@ public class Calculator {
 				if (operands[i].charAt(0) == 'f') {
 					operands[i] = "" + calc(operands[i]) / 10;
 				}
-			
+
 				expression += operands[i];
 			}
 		}
@@ -164,7 +164,7 @@ public class Calculator {
 
 	public double calcUsingPreviousResult(String expression, double result) {
 		try {
-			return calcExpression(expression.replaceAll("r", "" + result/10));
+			return calcExpression(expression.replaceAll("r", "" + result / 10));
 		} catch (Exception e) {
 			System.err.println("[X] " + e.getMessage());
 			Simple.pause();

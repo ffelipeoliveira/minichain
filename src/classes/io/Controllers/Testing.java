@@ -1,5 +1,7 @@
 package io.Controllers;
 
+import java.io.File;
+
 import core.App;
 import core.Blockchain;
 import core.Transaction;
@@ -10,13 +12,19 @@ import io.Print;
 
 public class Testing {
 
-    // Case 1 is defined within switch's testing submenu
+    // Case 1
+    // Will create a new Blockchain and delete previous blockchain files
+    public static void deleteBlockchainFiles(String defaultBlockDirectory) {
+        File directory = new File(defaultBlockDirectory);
+        for (File file: directory.listFiles()) if (!file.isDirectory()) file.delete();
+    }
 
     // Case 2
     // Can manage the Block's setData()
-    public static Block userModifyBlock(String menuPath, String defaultFolder, Blockchain blockChain) {
+    public static Block userModifyBlock(String menuPath, String defaultKeyDirectory, Blockchain blockChain) {
         Print.PrintBlockchain(blockChain);
-        System.out.println("[!] Select a block by it's number to modify (this operation might invalidate your BlockChain)");
+        System.out.println(
+                "[!] Select a block by it's number to modify (this operation might invalidate your BlockChain)");
         try {
             Block foundBlock = App.searchBlock(Simple.intInput(), blockChain);
             Simple.banner(menuPath + "> Modify Block [1/2]");
@@ -27,11 +35,14 @@ public class Testing {
             int transactionsAmount = Simple.intInput(1, 5);
             transactions = new Transaction[transactionsAmount];
             for (int i = 0; i < transactionsAmount; i++) {
-                transactions[i] = Transferring.userCreateTransaction(menuPath + "> Modify Block", defaultFolder, blockChain);
+                transactions[i] = Transferring.userCreateTransaction(menuPath + "> Modify Block", defaultKeyDirectory,
+                        blockChain);
             }
-            Block newBlock = new Block(foundBlock.getPrevious(), foundBlock.getId() , foundBlock.getNonce(), foundBlock.getData());
+            Block newBlock = new Block(foundBlock.getPrevious(), foundBlock.getId(), foundBlock.getNonce(),
+                    foundBlock.getData());
             Block aux = blockChain.getHead();
-            while (aux.getPrevious().getId() != foundBlock.getId()) aux = aux.getPrevious();
+            while (aux.getPrevious().getId() != foundBlock.getId())
+                aux = aux.getPrevious();
             aux.setPrevious(newBlock);
             System.out.println("[!] Data modified sucessfully");
             return foundBlock;
@@ -51,7 +62,8 @@ public class Testing {
             Block foundBlock = App.searchBlock(Simple.intInput(), blockChain);
             Simple.banner(menuPath + "> Re-mine block");
             Print.PrintFullBlock(foundBlock);
-            if(!Simple.userConfirmation("ARE YOU SURE YOU WANT TO PROCEED? (THIS ACTION MIGHT TAKE SEVERAL MINUTES)")) {
+            if (!Simple
+                    .userConfirmation("ARE YOU SURE YOU WANT TO PROCEED? (THIS ACTION MIGHT TAKE SEVERAL MINUTES)")) {
                 System.out.println("[!] Operation aborted.");
                 return;
             }
