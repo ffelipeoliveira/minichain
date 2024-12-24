@@ -5,7 +5,7 @@ import other.Log;
 
 public class Menu extends Submenus {
     // Main menu #########################################
-    public boolean menu(String defaultDirectory, String keyDirectory, String blockDirectory,
+    public boolean menu(String directory, String keyDirectory, String blockDirectory,
             Blockchain blockchain, Log log) {
         String menuPath = "Menu";
         Simple.banner(menuPath);
@@ -25,12 +25,12 @@ public class Menu extends Submenus {
                     ;
                 return true;
             case 2:
-                while (miningSubmenu(menuPath, keyDirectory, blockDirectory,
+                while (miningSubmenu(menuPath, directory, keyDirectory, blockDirectory,
                         blockchain, log))
                     ;
                 return true;
             case 3:
-                while (viewingSubmenu(menuPath, keyDirectory, blockchain, log))
+                while (viewingSubmenu(menuPath, directory, keyDirectory, blockchain, log))
                     ;
                 return true;
             case 4:

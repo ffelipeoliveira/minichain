@@ -15,14 +15,14 @@ public class Mining {
 
     // Case 1
     // Controller for userMineBlock
-    public static void userMine(String menuPath, String defaultKeyDirectory, String defaultBlockDirectory,
+    public static void userMine(String menuPath, String directory, String keyDirectory, String blockDirectory,
             Blockchain blockchain, Log log) {
         menuPath = menuPath + " > Mine new Block";
         Simple.banner(menuPath);
         try {
             App.validateBlockchain(blockchain);
             log.start();
-            boolean sucessful = userMineBlock(menuPath, defaultKeyDirectory, defaultBlockDirectory, blockchain);
+            boolean sucessful = userMineBlock(menuPath, directory, keyDirectory, blockDirectory, blockchain);
             if (sucessful)
                 log.addToLog("Mined block", log.finish());
         } catch (Exception e) {
@@ -32,14 +32,14 @@ public class Mining {
     }
 
     // Controller for mining a block
-    public static boolean userMineBlock(String menuPath, String defaultKeyDirectory, String defaultBlockDirectory,
+    public static boolean userMineBlock(String menuPath, String directory, String keyDirectory, String blockDirectory,
             Blockchain blockChain) {
         menuPath = menuPath + " > Mining Block";
         PublicKey minerPublicKey = null;
 
         try {
             Simple.banner(menuPath);
-            minerPublicKey = KeyManaging.userSelectPublicKey(menuPath, defaultKeyDirectory, true,
+            minerPublicKey = KeyManaging.userSelectPublicKey(menuPath, keyDirectory, true,
                     "Select your Public Key");
             if (minerPublicKey == null) {
                 return false;
@@ -51,14 +51,14 @@ public class Mining {
                 return false;
             }
 
-            Block block = App.mineBlock(menuPath, defaultKeyDirectory, blockChain, minerPublicKey);
+            Block block = App.mineBlock(menuPath, directory, blockChain, minerPublicKey);
 
             Simple.banner(menuPath);
             System.out.println("[!] Block sucessfully mined! Nonce was " + block.getNonce()
                     + ", your reward will be included in the next Block.");
 
-            App.saveBlock(defaultBlockDirectory, block);
-            System.out.println("[!] Block has been saved in " + defaultBlockDirectory);
+            App.saveBlock(blockDirectory, block);
+            System.out.println("[!] Block has been saved in " + blockDirectory);
 
             return true;
         } catch (IOException e) {

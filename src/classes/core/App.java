@@ -128,10 +128,10 @@ public class App {
 	}
 
 	// Will try to mine a block
-	public static Block mineBlock(String menuPath, String keyDirectory, Blockchain blockchain, PublicKey publicKey) throws Exception {
+	public static Block mineBlock(String menuPath, String directory, Blockchain blockchain, PublicKey publicKey) throws Exception {
 		double nonce = 0;
 		int id = blockchain.length();
-		Transaction[] data = mergeTransactions(menuPath, keyDirectory, blockchain, blockchain.getTransactionHead(), publicKey);
+		Transaction[] data = mergeTransactions(menuPath, directory, blockchain, blockchain.getTransactionHead(), publicKey);
 
 		Block block = new Block(blockchain.getHead(), id, nonce, data);
 		while (!validateHash(blockchain, block)) {
@@ -139,7 +139,7 @@ public class App {
 			block = new Block(blockchain.getHead(), id, nonce, data);
 		}
 
-		blockchain.addBlock(menuPath, keyDirectory, block, publicKey);
+		blockchain.addBlock(menuPath, directory, block, publicKey);
 		return block;
 	}
 

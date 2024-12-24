@@ -15,7 +15,7 @@ public class Submenus {
     double calculatorResult = 0; // Displayed when using calculator
 
     // Case 1:
-    protected boolean transactionSubmenu(String menuPath, String defaultKeyDirectory, Blockchain blockchain, Log log) {
+    protected boolean transactionSubmenu(String menuPath, String directory, Blockchain blockchain, Log log) {
         menuPath += " > Transactions";
         Simple.banner(menuPath);
         System.out.print("""
@@ -27,7 +27,7 @@ public class Submenus {
             case 1:
                 Simple.banner(menuPath + " > Transfer");
                 log.start();
-                boolean sucessful = Transferring.userAddTransaction(menuPath, defaultKeyDirectory, blockchain);
+                boolean sucessful = Transferring.userAddTransaction(menuPath, directory, blockchain);
                 if (sucessful)
                     log.addToLog("Added Transaction", log.finish());
                 if (sucessful)
@@ -41,7 +41,7 @@ public class Submenus {
                 String pk = Simple.strInput(30);
                 log.start();
                 System.out
-                        .println("[!] Found " + App.searchForTokens("Menu > Transactions > See tokens", defaultKeyDirectory, blockchain, pk)
+                        .println("[!] Found " + App.searchForTokens("Menu > Transactions > See tokens", directory, blockchain, pk)
                                 + " tokens for this public key.");
                 log.addToLog("Searched tokens", log.finish());
                 Simple.pause();
@@ -52,7 +52,7 @@ public class Submenus {
     }
 
     // Case 2:
-    protected boolean miningSubmenu(String menuPath, String defaultKeyDirectory, String defaultBlockDirectory,
+    protected boolean miningSubmenu(String menuPath, String directory, String keyDirectory, String blockDirectory,
             Blockchain blockchain, Log log) {
         menuPath += " > Mining";
         Simple.banner(menuPath);
@@ -64,7 +64,7 @@ public class Submenus {
         System.out.println("[!] Current reward:" + blockchain.reward());
         switch (Simple.intInput(1, 2)) {
             case 1:
-                Mining.userMine(menuPath, defaultKeyDirectory, defaultBlockDirectory, blockchain, log);
+                Mining.userMine(menuPath, directory, keyDirectory, blockDirectory, blockchain, log);
                 return true;
             default:
                 return false;
@@ -72,7 +72,7 @@ public class Submenus {
     }
 
     // Case 3:
-    protected boolean viewingSubmenu(String menuPath, String defaultKeyDirectory, Blockchain blockchain, Log log) {
+    protected boolean viewingSubmenu(String menuPath, String directory, String keyDirectory, Blockchain blockchain, Log log) {
         menuPath += " > Viewing";
         Simple.banner(menuPath);
         System.out.print("""
@@ -125,7 +125,7 @@ public class Submenus {
                 System.out.println("[!] Paste the hash of a public key (Can be viewed on the Blockchain)");
                 String pk = Simple.strInput(30);
                 log.start();
-                System.out.println("[!] Found " + App.searchForTokens("Menu > Viewing > View Tokens", defaultKeyDirectory, blockchain, pk)
+                System.out.println("[!] Found " + App.searchForTokens("Menu > Viewing > View Tokens", directory, blockchain, pk)
                         + " tokens for this public key.");
                 log.addToLog("Searched tokens", log.finish());
                 Simple.pause();
@@ -193,7 +193,7 @@ public class Submenus {
     }
 
     // Case 6
-    protected boolean testingSubmenu(String menuPath, String defaultKeyDirectory, String defaultBlockDirectory, Blockchain blockchain, Log log) {
+    protected boolean testingSubmenu(String menuPath, String keyDirectory, String blockDirectory, Blockchain blockchain, Log log) {
         menuPath += " > Testing";
         Simple.banner(menuPath);
         System.out.print("""
@@ -204,8 +204,8 @@ public class Submenus {
                 """);
         switch (Simple.intInput(1, 4)) {
             case 1:
-                Testing.deleteBlockchainFiles(defaultBlockDirectory);
-                blockchain = new Blockchain(defaultBlockDirectory);
+                Testing.deleteBlockchainFiles(blockDirectory);
+                blockchain = new Blockchain(blockDirectory);
                 Simple.banner(menuPath);
                 log.start();
                 System.out.println("[!] Resetted sucesfully. Restart to take effect.");
@@ -214,7 +214,7 @@ public class Submenus {
                 return true;
             case 2:
                 Simple.banner(menuPath + " > Modify Block");
-                Block modifiedBlock = Testing.userModifyBlock(menuPath, defaultKeyDirectory, blockchain);
+                Block modifiedBlock = Testing.userModifyBlock(menuPath, keyDirectory, blockchain);
                 if (modifiedBlock != null) {
                     Simple.banner(menuPath + " > Modify Block");
                     System.out.println("[!] Block modified sucessfully!");

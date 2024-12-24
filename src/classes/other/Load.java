@@ -86,13 +86,13 @@ public class Load {
 
 	private boolean readBlockChainKey() {
 		try {
-			Encryption.readBlockchainKey(keyDirectory);
+			Encryption.readBlockchainKey(directory);
 			System.out.println("[!] Blockchain key found!");
 			return true;
 		} catch (Exception e) {
 			System.out.println("[X] Blockchain key not available, attempting to create one.");
 			try {
-				Encryption.generateBlockchainKey(keyDirectory);
+				Encryption.generateBlockchainKey(directory);
 				System.out.println("[!] Blockchain key created!");
 				return true;
 			} catch (Exception ex) {

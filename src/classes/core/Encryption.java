@@ -102,13 +102,13 @@ public class Encryption {
 	}
 
 	//Can generate BlockchainKey
-	public static void generateBlockchainKey(String keyDirectory) throws Exception {
-		storeKeys(keyDirectory, generateKeyPair(), "Blockchain");
+	public static void generateBlockchainKey(String directory) throws Exception {
+		storeKeys(directory, generateKeyPair(), "Blockchain");
 	}
 
 	// Can read the default BlockchainKey
-	public static PublicKey readBlockchainKey(String keyDirectory) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		File publicKeyFile = new File(keyDirectory + "BlockchainPublic.key");
+	public static PublicKey readBlockchainKey(String directory) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		File publicKeyFile = new File(directory + "BlockchainPublic.key");
 		byte[] publicKeyBytes = Files.readAllBytes(publicKeyFile.toPath());
 		KeyFactory keyFactory = KeyFactory.getInstance("EC");
 		EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
